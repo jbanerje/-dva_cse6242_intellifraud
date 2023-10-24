@@ -1,75 +1,58 @@
-
 import dash
-import dash_core_components as dcc
-import dash_html_components as html
+from dash import dcc
+from dash import html
 from dash.dependencies import Input, Output
-import pandas as pd
 import plotly.express as px
+import pandas as pd
 
-# Sample data (replace with your actual data)
-data = pd.DataFrame({
-    'income': [0.6, 0.8, 0.5, 0.9, 0.7],
-    'customer_age': [30, 40, 25, 35, 28],
-    'zip_count_4w': [1500, 2000, 1000, 2500, 1800],
-    'credit_risk_score': [200, 300, 180, 250, 220],
-    'fraud_bool': [0, 1, 0, 1, 0]
-})
 
-# Initialize the Dash app
+''' Visualization code to build interactive dashboard for Intellifraud tool'''
+# Load in dataset
+ #df = pd.read_csv("../Data/Base.csv")
+df = pd.read_csv("subset_viz_data.csv")
+# Create a Dash web application
 app = dash.Dash(__name__)
 
 # Define the layout of the dashboard
 app.layout = html.Div([
-    html.H1("Fraud Detection Dashboard"),
+    html.H1("Intellifraud: An Early Fraud Detection Tool"),
 
+    # Dropdown to select a feature for visualization
     dcc.Dropdown(
-        id='data-filter',
-        options=[
-            {'label': 'All', 'value': 'all'},
-            {'label': 'Fraudulent', 'value': 'fraudulent'},
-            {'label': 'Non-Fraudulent', 'value': 'non-fraudulent'}
-        ],
-        value='all',
-        multi=False
+        id='feature-dropdown',
+        options=[{'label': col, 'value': col} for col in df.columns],
+        value='income'  # Default selection
     ),
 
-    dcc.Graph(id='income-vs-age-scatter'),
+    # Scatter plot to visualize selected feature
+    dcc.Graph(id='scatter-plot'),
 
-    dcc.Graph(id='credit-score-histogram')
+    # Bar chart for distribution of fraud
+    dcc.Graph(id='fraud-distribution'),
 ])
 
 
-# Define callbacks to update the graphs based on user input
+# Callback to update the scatter plot
 @app.callback(
-    [Output('income-vs-age-scatter', 'figure'),
-     Output('credit-score-histogram', 'figure')],
-    [Input('data-filter', 'value')]
+    Output('scatter-plot', 'figure'),
+    Input('feature-dropdown', 'value')
 )
-def update_graphs(selected_filter):
-    if selected_filter == 'all':
-        filtered_data = data
-    elif selected_filter == 'fraudulent':
-        filtered_data = data[data['fraud_bool'] == 1]
-    else:
-        filtered_data = data[data['fraud_bool'] == 0]
+def update_scatter_plot(selected_feature):
+    fig = px.scatter(df, x=selected_feature, y='credit_risk_score', color='fraud_bool',
+                     title=f'Scatter Plot for {selected_feature}')
+    return fig
 
-    # Create a scatter plot for income vs. age
-    scatter_fig = px.scatter(
-        filtered_data, x='income', y='customer_age',
-        color='fraud_bool', labels={'fraud_bool': 'Fraudulent'},
-        title='Income vs. Customer Age'
-    )
+# Callback to update the bar chart for fraud distribution
+@app.callback(
+    Output('fraud-distribution', 'figure'),
+    [Input('feature-dropdown', 'value')]
+)
+def update_fraud_distribution(selected_feature):
+    # Create a bar chart to show the distribution of fraud based on the selected feature
+    fraud_distribution = df.groupby(selected_feature)['fraud_bool'].mean().reset_index()
+    fig = px.bar(fraud_distribution, x=selected_feature, y='fraud_bool',
+                 title=f'Fraud Distribution by {selected_feature}')
+    return fig
 
-    # Create a histogram for credit scores
-    histogram_fig = px.histogram(
-        filtered_data, x='credit_risk_score',
-        color='fraud_bool', labels={'fraud_bool': 'Fraudulent'},
-        title='Credit Risk Score Distribution'
-    )
-
-    return scatter_fig, histogram_fig
-
-
-# Run the app
 if __name__ == '__main__':
     app.run_server(debug=True)
