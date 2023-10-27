@@ -5,6 +5,7 @@ import pandas as pd
 from datetime import datetime
 import config        
 from pre_process import *
+from feature_importance import *
 import joblib
 import numpy as np # linear algebra
 import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
@@ -37,6 +38,15 @@ from sklearn.ensemble import VotingClassifier
 from xgboost import XGBClassifier
 from lightgbm import LGBMClassifier
 import joblib
+import plotly.express as px
+
+def display_feature_importance(usr_model):
+
+    feature_imp = calc_feature_importance(usr_model)
+    fig = px.bar(feature_imp, x="Feature_Importance", y="Feature", orientation='h')
+    st.plotly_chart(fig, theme="streamlit", use_container_width=True)
+
+    return
 
 def predict_fraud(usr_model, formatted_inp_for_prediction):
     
@@ -131,6 +141,9 @@ def streamlit_interface():
                     st.error('Its a Fraud Account!', icon="🚨")
                 else:
                     st.success('Not a Fraud', icon="✅")
+    
+    # display feature importance
+    display_feature_importance(usr_model)
     
     return
 
