@@ -79,6 +79,18 @@ colorblind_palettes = {
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
 # Add Streamlit code to create the interactive dashboard
+st.markdown(
+    """
+    <style>
+    .stApp {
+        text-align: center;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+# Add Streamlit code to create the interactive dashboard
 st.title('Exploratory Data Analysis')
 
 # Add widgets (e.g., sliders, dropdowns, etc.) for user interaction
@@ -89,6 +101,7 @@ selected_column = [col for col, label in column_labels.items() if label == selec
 
 # Columns for layout of dashboard
 col1, col2 = st.columns(2)
+col3, col4 = st.columns(2)
 
 # # # # # # # # # # # # Uncomment to get back basic descriptive stats table # # # # # # # # # # # #
 # st.write(f"### Descriptive Statistics for {selected_feature}")
@@ -120,11 +133,15 @@ col1, col2 = st.columns(2)
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Color customization widgets for violin plot
 with col1:
-    violin_color = st.color_picker("Select Violin Plot Color", value="#FFFFFF")
-    box_color = st.color_picker("Select Box Color", value="#000000")
+    #violin_color = st.color_picker("Select Violin Plot Color", value="#FFFFFF")
+    #box_color = st.color_picker("Select Box Color", value="#000000")
+
+    # Define default colors
+    default_violin_color = "#FFFFFF"
+    default_box_color = "#000000"
 
     # Create a violin plot for the selected feature using Plotly
-    st.write(f"### {selected_feature} Distribution")
+  #  st.write(f"### {selected_feature} Distribution")
 
     # Check if the selected column is numeric before creating the violin plot
     if data[selected_column].dtype in ['int64', 'float64']:
@@ -133,22 +150,22 @@ with col1:
         fig.add_trace(go.Violin(
             y=data[selected_column],
             box_visible=True,
-            line_color=box_color,
-            fillcolor=violin_color,
+            line_color=default_box_color,
+            fillcolor=default_violin_color,
             opacity=0.6
         ))
 
         custom_tooltip = f"Mean: {data[selected_column].mean():.2f}<br>Median: {data[selected_column].median():.2f}"
-        fig.update_traces(hoverinfo='y+name', name=custom_tooltip, line_color=box_color)
+        fig.update_traces(hoverinfo='y+name', name=custom_tooltip, line_color=default_box_color)
 
         # Update layout and labels
         fig.update_layout(
             title=f"{selected_feature} Distribution",
-            title_x=0.5,  # Center the title horizontally
+            title_x=0.55,  # Center the title horizontally
             title_y=0.9,  # Position the title closer to the top
             title_xanchor="center",  # Center the title horizontally
             title_yanchor="top",  # Position the title at the top
-            xaxis_title=selected_column,
+            xaxis_title=selected_feature,
             yaxis_title="Density",
             width=plot_width,  # Set the width
             height=plot_height,  # Set the height
@@ -156,6 +173,12 @@ with col1:
 
         # Show the interactive plot
         st.plotly_chart(fig)
+
+        # Move color selection boxes to the bottom
+        # st.sidebar.header("Color Selection")
+        # violin_color = st.sidebar.color_picker("Select Violin Plot Color", value="#FFFFFF")
+        # box_color = st.sidebar.color_picker("Select Box Color", value="#000000")
+
     else:
         st.write("This is a non-numeric column. No violin plot available.")
 
@@ -166,8 +189,12 @@ with col2:
     if data[selected_column].dtype in ['int64', 'float64']:
         hist_fig = px.histogram(data, x=selected_column, nbins=30, color_discrete_sequence=['lightblue'])  # Change the color here
         hist_fig.update_layout(
-            title=f"{selected_feature} Distribution",
-            xaxis_title=selected_column,
+            title=f"{selected_feature} Histogram",
+            title_x=0.55,  # Center the title horizontally
+            title_y=0.92,  # Position the title closer to the top
+            title_xanchor="center",  # Center the title horizontally
+            title_yanchor="top",  # Position the title at the top
+            xaxis_title=selected_feature,
             yaxis_title="Frequency",
             hovermode="closest",  # Enable hover for data points
             width=plot_width,  # Set the width
@@ -179,6 +206,13 @@ with col2:
             name=custom_tooltip,
             hoverlabel = dict(bgcolor="#282828", font = dict(color="white")) # Box color followed by text color
         )
+
+        # Add padding to move the figure down
+        st.markdown(
+            f'<style>div.row-widget.stPlotlyChart {{ padding: 20px; }}</style>',
+            unsafe_allow_html=True
+        )
+
         # Display the histogram
         st.plotly_chart(hist_fig)
     else:
@@ -201,8 +235,9 @@ with col2:
 # else:
 #     st.write("This is a non-numeric column. No kernel density plot available.")
 
+
 # Create a smooth Kernel Density Plot
-st.write(f"### {selected_feature} Kernel Density Plot")
+# st.write(f"### {selected_feature} Kernel Density Plot")
 
 if data[selected_column].dtype in ['int64', 'float64'] and len(data[selected_column].unique()) > 2:
     # Check if the feature is non-binary and numeric
@@ -217,8 +252,8 @@ if data[selected_column].dtype in ['int64', 'float64'] and len(data[selected_col
     fig.add_trace(go.Histogram(
         x=not_fraud_data,
         histnorm='probability density',
-        marker_color='blue',  # Set color for Not Fraud
-        opacity=0.5,          # Adjust opacity for transparency
+        marker_color='#8FC4C0',  # Set color for Not Fraud
+        opacity=1,          # Adjust opacity for transparency
         name='Not Fraud'
     ))
 
@@ -226,19 +261,24 @@ if data[selected_column].dtype in ['int64', 'float64'] and len(data[selected_col
     fig.add_trace(go.Histogram(
         x=fraud_data,
         histnorm='probability density',
-        marker_color='red',   # Set color for Fraud
-        opacity=0.5,          # Adjust opacity for transparency
+        marker_color='#F0B3BE',   # Set color for Fraud
+        opacity=1,          # Adjust opacity for transparency
         name='Fraud'
     ))
 
     # Update layout and labels
     fig.update_layout(
         title=f"Kernel Density Plot of {selected_feature}",
-        xaxis_title=selected_column,
+        xaxis_title=selected_feature,
         yaxis_title="Density",
-        width=700,  # Adjust the width of the figure
-        height=500,  # Adjust the height of the figure
+        title_x=0.50,  # Center the title horizontally
+        title_y=0.92,  # Position the title closer to the top
+        title_xanchor="center",  # Center the title horizontally
+        title_yanchor="top",  # Position the title at the top
+        width=plot_width,  # Adjust the width of the figure
+        height=plot_height,  # Adjust the height of the figure
     )
+
 
     # Show the interactive plot
     st.plotly_chart(fig)
