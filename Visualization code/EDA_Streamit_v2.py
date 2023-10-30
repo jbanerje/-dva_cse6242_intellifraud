@@ -5,6 +5,7 @@ import seaborn as sns
 import plotly.express as px
 import plotly.graph_objs as go
 import numpy as np
+import math
 
 # # # MUST HAVE TO FORCE WIDE MODE! DO NOT MOVE!!! # # #
 # Set the page layout
@@ -18,7 +19,7 @@ plot_width = 700
 plot_height = 700
 
 # Load dataset
-data = pd.read_csv('subset_viz_data.csv')  # Replace with your dataset file
+data = pd.read_csv('../Data/Base.csv')  # Replace with your dataset file
 
 # Replace column names with easier to read names
 column_labels = {
@@ -96,7 +97,7 @@ selected_column = [col for col, label in column_labels.items() if label == selec
 
 # Columns for layout of dashboard
 col1, col2 = st.columns(2)
-col3, col4 = st.columns(2)
+#col3, col4 = st.columns(2)
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -225,7 +226,7 @@ if data[selected_column].dtype in ['int64', 'float64'] and len(data[selected_col
         title_y=0.92,  # Position the title closer to the top
         title_xanchor="center",  # Center the title horizontally
         title_yanchor="top",  # Position the title at the top
-        width=plot_width,  # Adjust the width of the figure
+        width=1200,  # Adjust the width of the figure
         height=plot_height,  # Adjust the height of the figure
     )
 
@@ -235,41 +236,69 @@ if data[selected_column].dtype in ['int64', 'float64'] and len(data[selected_col
 else:
     st.write("This is a binary or non-numeric column. No kernel density plot available.")
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-########################################################################################################################
+
 # Correlation Heatmap
-
-st.write("### Correlation Heatmap")
+#st.write("### Correlation Heatmap")
 
 numeric_data = data.select_dtypes(include=['number'])  # Select only numeric columns
 corr_matrix = numeric_data.corr()
 
 # Create an interactive heatmap using Plotly
 fig = go.Figure(data=go.Heatmap(
-    z=corr_matrix.values,
-    x=corr_matrix.columns,
-    y=corr_matrix.columns,
+    z=corr_matrix.values,  # Keep original correlation values
+    x=[column_labels.get(col, col) for col in corr_matrix.columns],  # Use column_labels for x-axis labels
+    y=[column_labels.get(col, col) for col in corr_matrix.columns],  # Use column_labels for y-axis labels
     colorscale="Viridis",  # Color scale
-    colorbar=dict(title="Correlation"),
+    colorbar=dict(title="Correlation", x=1.15),  # Add color scale to the right
     hoverongaps=False,  # To remove gaps when hovering
     hoverinfo="z+x+y",  # Display correlation values and row/column names on hover
-    showscale=False  # To hide the color scale bar
+    hoverlabel=dict(bgcolor="#282828", font=dict(color="white")),  # Box color followed by text color
+    showscale=True,  # Show the color scale bar
 ))
 
-# Update the layout of the heatmap
+# Create a slider for the user to select the correlation threshold
+threshold = st.slider("Select Correlation Threshold", min_value=0.0, max_value=1.0, value=0.30, step=0.01)
+
+# Create an interactive heatmap using Plotly
+fig = go.Figure(data=go.Heatmap(
+    z=corr_matrix.values,  # Keep original correlation values
+    x=[column_labels.get(col, col) for col in corr_matrix.columns],  # Use column_labels for x-axis labels
+    y=[column_labels.get(col, col) for col in corr_matrix.columns],  # Use column_labels for y-axis labels
+    colorscale="Viridis",  # Color scale
+    colorbar=dict(title="Correlation", x=1.15),  # Add color scale to the right
+    hoverongaps=False,  # To remove gaps when hovering
+    hoverinfo="z+x+y",  # Display correlation values and row/column names on hover
+    hoverlabel=dict(bgcolor="#282828", font=dict(color="white")),  # Box color followed by text color
+    showscale=True,  # Show the color scale bar
+))
+
+# Update the z values to NaN where correlations are outside the desired range
+fig.data[0].z[abs(corr_matrix) <= threshold] = None
+
+# Update the layout of the heatmap to add gridlines
 fig.update_layout(
     title="Correlation Heatmap",
     xaxis_nticks=len(corr_matrix.columns),
     yaxis_nticks=len(corr_matrix.columns),
     xaxis_title="Features",
     yaxis_title="Features",
+    title_x=0.50,  # Center the title horizontally
+    title_y=0.95,  # Position the title closer to the top
+    title_xanchor="center",  # Center the title horizontally
+    title_yanchor="top",  # Position the title at the top
     height=1000,  # Set the desired height (e.g., 400 pixels)
     width=1200,  # Set the desired width (e.g., 600 pixels)
+    # xaxis=dict(showgrid=True, gridwidth=1, gridcolor='rgba(0,0,0,0.1)'),  # Add x-axis gridlines
+    # yaxis=dict(showgrid=True, gridwidth=1, gridcolor='rgba(0,0,0,0.1)'),  # Add y-axis gridlines
 )
 
 # Display the interactive heatmap
 st.plotly_chart(fig)
 
+
+########################################################################################################################
 # Data Privacy Information
 st.write("### Data Privacy Information")
 st.write("We are committed to maintaining data privacy. Customer financial data is not shared or exposed.")
