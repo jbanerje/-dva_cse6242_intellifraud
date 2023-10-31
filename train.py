@@ -1,36 +1,24 @@
+## Code for Modelling
 import numpy as np # linear algebra
 import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
-# All imports here
-from sklearn.compose import make_column_selector
 
-from sklearn.metrics import confusion_matrix # Library for model evaluation
-from sklearn.metrics import accuracy_score # Library for model evaluation
-from sklearn.model_selection import train_test_split # Library to split datset into test and train
-
-from sklearn.dummy import DummyClassifier
-from sklearn.linear_model  import LogisticRegression # Logistic Regression Classifier
-from sklearn.linear_model import SGDClassifier # Stochastic Gradient Descent Classifier
-from sklearn.tree import DecisionTreeClassifier # Decision Tree Classifier
-from sklearn.ensemble  import RandomForestClassifier # Random Forest Classifier
-from sklearn.neighbors import KNeighborsClassifier # K Nearest neighbors Classifier
-from sklearn.naive_bayes import GaussianNB #Naive Bayes Classifier
-from sklearn.svm import SVC #Support vector Machine Classifier
-from sklearn.ensemble import AdaBoostClassifier # Ada Boost Classifier
-from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, classification_report, confusion_matrix, roc_auc_score
-from sklearn.model_selection import cross_val_score, RepeatedStratifiedKFold
-from sklearn.metrics import precision_recall_curve
-from sklearn.metrics import average_precision_score
-from sklearn.model_selection import cross_val_score, GridSearchCV, KFold, RandomizedSearchCV, train_test_split
-from sklearn.metrics import average_precision_score, precision_recall_curve
-from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import accuracy_score, confusion_matrix # Library for model evaluation
 from sklearn import metrics
+from sklearn.model_selection import train_test_split # Library to split datset into test and train
+from sklearn.ensemble  import RandomForestClassifier # Random Forest Classifier
+from sklearn.ensemble import AdaBoostClassifier # Ada Boost Classifier
 from sklearn.ensemble import StackingClassifier
 from sklearn.ensemble import VotingClassifier
+from sklearn.linear_model  import LogisticRegression # Logistic Regression Classifier
+from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, classification_report, confusion_matrix, roc_auc_score
+from sklearn.model_selection import cross_val_score, RepeatedStratifiedKFold
 from xgboost import XGBClassifier
 from lightgbm import LGBMClassifier
 import joblib
 
 def create_sample_set(train_df, non_fraud_sample_sizse):
+    
+    ''' Function to Create Data for Modelling '''
     
     # Select columns
     train_df = train_df[['prev_address_months_count', 'date_of_birth_distinct_emails_4w','credit_risk_score', 'bank_months_count', 
@@ -135,7 +123,7 @@ def build_voting_classifier_model(X_train, X_test, y_train, y_test, classifier_m
     
     vote_classifier = VotingClassifier(
                                         estimators=[('ada', clf1),('xgb', clf2), ('lgb', clf3)],
-                                        voting='hard'
+                                        voting='soft'
                                     )
     
     # Fitting the training set into classification model
@@ -242,9 +230,9 @@ def perform_model_training():
     # Machine Learning Model Build
     classifier_model = [
                         RandomForestClassifier(random_state=42), 
-                        AdaBoostClassifier(random_state=42), 
-                        XGBClassifier(objective="binary:logistic", random_state=42),
-                        LGBMClassifier(random_state=42)
+                        AdaBoostClassifier(learning_rate = 0.1, n_estimators=500, random_state=42), 
+                        XGBClassifier(colsample_bytree=1.0, gamma=5, learning_rate=1.0, max_depth=5, min_child_weight=1,    n_estimators=10, subsample=1.0, random_state=42),
+                        LGBMClassifier(boosting_type = 'dart', colsample_bytree=1.0, learning_rate = 0.1, max_depth=10,n_estimators = 50, subsample=0.6, num_leaves = (2^5-1), random_state=42)
                     ]
 
     # Call Classification module

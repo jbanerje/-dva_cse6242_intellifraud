@@ -94,6 +94,14 @@ def streamlit_interface():
     image = Image.open("./images/intellifraud_icon.png")
     st.image(image, width = 300)
     
+    # Print the Header Banner
+    html_str = f"""
+                    <h3 style="background-color:#00A1DE; text-align:center; font-family:arial;color:white">FRAUD DETECTION SYSTEM </h3>
+                """
+
+    st.markdown(html_str, unsafe_allow_html=True)
+    st.divider()
+    
     # Select Model
     usr_model = st.sidebar.selectbox('Choose Your Model', config.classifier_models)
     
