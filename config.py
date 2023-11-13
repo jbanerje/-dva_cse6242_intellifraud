@@ -8,3 +8,18 @@ classifier_models   = ('LGBMClassifier',
                        'AdaBoostClassifier', 
                        'VotingClassifier', 
                        'StackingClassifier')
+
+shap_columns = ['Prev Address (Month)', 
+                'Email count', 
+                'Credit Score',
+                'Age of previous account (Months)',
+                'Credit Limit',
+                'Customer Age', 
+                'Housing Status', 
+                'Device OS', 
+                'Employment Status',
+                'Keep Alive Session', 
+                'Has Other Cards', 
+                'Has Valid Phone Num',
+                'Payment Type'
+                ]
