@@ -38,3 +38,8 @@ various kinds of financial frauds [13] would be happy to see the increased safet
 of fraud prevention teams.
 
 
+* Docker Execution
+============================
+	* docker build --no-cache -t intellifraud .
+	* docker run -p 8082:8501 intellifraud 
+	* localhost:8082

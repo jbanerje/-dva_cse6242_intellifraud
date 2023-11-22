@@ -8,3 +8,5 @@ classifier_models   = ('LGBMClassifier',
                        'AdaBoostClassifier', 
                        'VotingClassifier', 
                        'StackingClassifier')
+
+remove_nodes = ('INTERNET', 'TELEAPP', 'linux', 'macintosh', 'other','windows', 'x11', 'AA', 'AB', 'AC', 'AD', 'AE')
