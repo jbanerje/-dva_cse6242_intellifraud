@@ -1,5 +1,0 @@
-* Docker Execution
-============================
-	* docker build --no-cache -t productgenie .
-	* docker run -p 8082:8501 productgenie 
-	* localhost:8082
