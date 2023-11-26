@@ -184,10 +184,22 @@ def streamlit_interface():
     st.divider()
     
     # Read Dataset
-    intellifraud_dataset = pd.read_csv('./data/Base.csv')
+    file_list = ['Base.csv', 'variant_1.csv', 'variant_2.csv', 'variant_3.csv', 'variant_4.csv', 'variant_5.csv']
+    intellifraud_dataset = pd.DataFrame()
+
+    for file in file_list:
+        # Read all variants
+        input_df = pd.read_csv(f"./data/{file}")
+
+        # Extract Fraud Transactions
+        input_df_fraud = input_df[input_df.fraud_bool==1]
+
+        # Append the data into fraud dataset
+        intellifraud_dataset = intellifraud_dataset.append(input_df_fraud)
+        print('Shape of intellifraud_dataset : ', intellifraud_dataset.shape)
 
     # Create hierarchial Graph Layer
-    graph_df, graph_layer = create_hierarchial_network_layer(intellifraud_dataset)
+    _, graph_layer = create_hierarchial_network_layer(intellifraud_dataset)
     render_network_graph_default(graph_layer, None)
 
     # Sidebar Analysis

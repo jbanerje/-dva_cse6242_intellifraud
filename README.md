@@ -43,3 +43,11 @@ of fraud prevention teams.
 	* docker build --no-cache -t intellifraud .
 	* docker run -p 8082:8501 intellifraud 
 	* localhost:8082
+
+
+/kaggle/input/bank-account-fraud-dataset-neurips-2022/Base.csv
+/kaggle/input/bank-account-fraud-dataset-neurips-2022/Variant IV.csv
+/kaggle/input/bank-account-fraud-dataset-neurips-2022/Variant V.csv
+/kaggle/input/bank-account-fraud-dataset-neurips-2022/Variant I.csv
+/kaggle/input/bank-account-fraud-dataset-neurips-2022/Variant III.csv
+/kaggle/input/bank-account-fraud-dataset-neurips-2022/Variant II.csv
