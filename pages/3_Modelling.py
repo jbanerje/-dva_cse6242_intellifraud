@@ -10,6 +10,8 @@ import joblib
 from streamlit import components
 from sklearn.inspection import permutation_importance
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, PrecisionRecallDisplay,RocCurveDisplay
+import config
+from sklearn.model_selection import train_test_split # Library to split datset into test and train
 
 def map_categorical_column(df):
     
@@ -30,43 +32,7 @@ def map_categorical_column(df):
 
     return df
 
-def create_sample_set(train_df, non_fraud_sample_sizse):
-    
-    ''' Function to Create Data for Modelling '''
-    
-    # Select columns
-    train_df = train_df[['prev_address_months_count', 'date_of_birth_distinct_emails_4w','credit_risk_score', 'bank_months_count', 
-                         'proposed_credit_limit','customer_age', 'housing_status','device_os', 'employment_status',
-                         'keep_alive_session','has_other_cards','phone_home_valid','payment_type', 'fraud_bool', 'month']]
-    
-    # Fraud Transactions
-    train_df_fraud = train_df[train_df.fraud_bool == 1]
-    
-    # Non Fraud Transactions
-    train_df_non_fraud = train_df[train_df.fraud_bool == 0].sample(train_df_fraud.shape[0] * non_fraud_sample_sizse)
-    
-    # Merge Fraud & Non Fraud
-    train_df_merged = pd.concat([train_df_fraud, train_df_non_fraud])
-
-    # Shuffle
-    train_df_merged.iloc[:,:] = train_df_merged.sample(frac=1,random_state=123,ignore_index=True)
-    
-    # X & Y
-    X                 = train_df_merged.drop(columns=['fraud_bool'])
-    X['customer_age'] = X['customer_age'].apply(lambda x: 0 if x < 50 else 1)
-    y                 = train_df_merged[['fraud_bool', 'month']]
-    
-    # Train Dataframe
-    X_train = X[X.month <= 6].drop(columns=['month'])
-    y_train = y[y.month <= 6].drop(columns=['month']).values.ravel()
-
-    # Test Dataframe
-    X_test = X[X.month > 6].drop(columns=['month'])
-    y_test = y[y.month > 6].drop(columns=['month']).values.ravel()
-
-    return X_train, y_train, X_test, y_test
-
-def streamlit_interface(X_train, y_train, X_test, y_test):
+def set_page_layout():
     
     ''' Function to Create Streamlit Page '''
     
@@ -101,17 +67,35 @@ def streamlit_interface(X_train, y_train, X_test, y_test):
     # Header
     image = Image.open("./images/intellifraud_icon.png")
     st.image(image, width = 300)
+
+    return
+
+def create_sample_set(train_df, non_fraud_sample_sizse):
+
+    ''' Function to split data into train/test '''
+                           
+    # Fraud Transactions
+    train_df_fraud = train_df[train_df.fraud_bool == 1]
     
-    # Select Model
-    usr_model = st.sidebar.selectbox('Choose Your Model', ('LGBMClassifier', 
-                                                            'XGBClassifier', 
-                                                            'AdaBoostClassifier', 
-                                                            'VotingClassifier', 
-                                                            'StackingClassifier'))
+    # Non Fraud Transactions
+    train_df_non_fraud = train_df[train_df.fraud_bool == 0].sample(train_df_fraud.shape[0] * non_fraud_sample_sizse)
+    
+    # Merge Fraud & Non Fraud
+    train_df_merged = pd.concat([train_df_fraud, train_df_non_fraud])
+ 
+    # X & Y
+    X                 = train_df_merged.drop(columns=['fraud_bool'])
+    y                 = train_df_merged['fraud_bool']
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=42)
+
+    return X_train, y_train, X_test, y_test
+
+def analyze_model(X_train, y_train, X_test, y_test, usr_sample, usr_model):
     
     # Load Model & Metrics Summary
-    classifier = joblib.load(f'./model/{usr_model}.pkl')
-    metrics_df = pd.read_csv('./model/results.csv')
+    classifier = joblib.load(f'./model/sample_{usr_sample}/{usr_model}.pkl')
+    # metrics_df = pd.read_csv('./model/results.csv')
     
     # Print the Header Banner
     html_str = f"""
@@ -121,17 +105,12 @@ def streamlit_interface(X_train, y_train, X_test, y_test):
     st.markdown(html_str, unsafe_allow_html=True)
     st.divider()
     
-    # Show Metrics
-    st.dataframe(metrics_df[metrics_df.Classifier == usr_model][['Classifier', 'Accuracy', 'Precision',
-       'Recall', 'F1_Score', 'ROC_AUC_Scr', 'CV_Score']], hide_index=True, use_container_width=True)
-    st.divider()
-    
     # Show Graphs
     col1, col2= st.columns(2)
     with col1:
         st.write("Confusion Matrix")
-        predictions = classifier.predict(X_test)
-        cm = confusion_matrix(y_test, predictions, labels=classifier.classes_)
+        y_pred = classifier.predict(X_test)
+        cm = confusion_matrix(y_test, y_pred, labels=classifier.classes_)
         disp = ConfusionMatrixDisplay(confusion_matrix=cm,
                                     display_labels=['No Fraud', 'Fraud'])
         disp.plot()
@@ -139,7 +118,7 @@ def streamlit_interface(X_train, y_train, X_test, y_test):
 
     with col2:
         st.write("Area Under Curve(AUC) - TPR vs FPR")
-        disp = RocCurveDisplay.from_estimator(classifier, X_test, y_test)
+        disp = RocCurveDisplay.from_predictions(y_test, y_pred)
         disp.plot()
         st.pyplot()
 
@@ -148,7 +127,7 @@ def streamlit_interface(X_train, y_train, X_test, y_test):
     col3, col4= st.columns(2)
     with col3:
         st.write("Precision Recall Curve")
-        disp = PrecisionRecallDisplay.from_estimator(classifier, X_test, y_test)
+        disp = PrecisionRecallDisplay.from_predictions(y_test, y_pred)
         disp.plot()
         st.pyplot()
     
@@ -173,13 +152,34 @@ def streamlit_interface(X_train, y_train, X_test, y_test):
 
 if __name__ == '__main__':
     
-    # Load Input Data
-    input_df = pd.read_csv("./data/Base.csv")
-    input_df_num = map_categorical_column(input_df)
+    set_page_layout()
 
-    X_train, y_train, X_test, y_test = create_sample_set(input_df_num, 1)
-    
-    streamlit_interface(X_train, y_train, X_test, y_test)
+    # Create 3 Columns
+    col_data, col_under_sample_strategy, col_model = st.columns(3)
+    st.sidebar.title('Analyze')
+    with col_data:
+        # Load Input Data
+        select_file_modelling   =  st.sidebar.selectbox(label = 'Select Data', options=config.file_list)
+        input_df                = pd.read_csv(f'./data/{select_file_modelling}')  # Replace with your dataset file
+
+    with col_under_sample_strategy:
+        # Load Sampling Strategy
+        select_sample_strategy  =  st.sidebar.selectbox(label = 'Fraud vs Non Fraud Sampling', options=config.sampling_strategy)
+
+    with col_model:
+        # Load Model
+        select_model =  st.sidebar.selectbox(label = 'Model', options=config.classifier_models)
+
+    if st. sidebar.button('Submit'):
+
+        input_df_num = map_categorical_column(input_df)
+
+        X_train, y_train, X_test, y_test = create_sample_set(
+                                                                input_df_num[config.reqd_col_modelling], 
+                                                                config.sampling_strategy_dict[select_sample_strategy]
+                                                            )
+        
+        analyze_model(X_train, y_train, X_test, y_test, select_sample_strategy, select_model)
 
     
     

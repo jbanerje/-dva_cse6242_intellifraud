@@ -41,7 +41,7 @@ def  render_network_graph_default(graph_layer, nodes_to_be_removed):
     node_size_dict = dict(G.degree)
     node_size  = [node_size_dict[k]*100 for k in node_size_dict] # Node Color
 
-    edge_width = [0.000005 * G[u][v]['weight'] for u, v in G.edges()]  # Edge Width
+    edge_width = [0.000040 * G[u][v]['weight'] for u, v in G.edges()]  # Edge Width
 
     fig, ax = plt.subplots(figsize=(6, 6))
     
@@ -52,7 +52,7 @@ def  render_network_graph_default(graph_layer, nodes_to_be_removed):
                     node_color = node_color, 
                     node_size=550,
                     node_shape="o",
-                    alpha = 0.6, 
+                    alpha = 0.7, 
                     width = edge_width, 
                     font_weight="bold",
                     cmap = plt.cm.tab20_r
@@ -63,7 +63,7 @@ def  render_network_graph_default(graph_layer, nodes_to_be_removed):
                                 edge_labels=labels,
                                 label_pos = 0.6,
                                 font_size=3,
-                                alpha=0.6,
+                                alpha=1,
                                 rotate=False,
                                 )
     
@@ -148,7 +148,7 @@ def streamlit_interface():
     # Page Setup
     st.set_page_config(
                         page_title="IntelliFraud",
-                        layout="centered",
+                        layout="wide",
                         initial_sidebar_state="auto",
                         page_icon='./images/fraud-detection.png',
                     )
@@ -184,7 +184,7 @@ def streamlit_interface():
     st.divider()
     
     # Read Dataset
-    file_list = ['Base.csv', 'variant_1.csv', 'variant_2.csv', 'variant_3.csv', 'variant_4.csv', 'variant_5.csv']
+    file_list = config.file_list
     intellifraud_dataset = pd.DataFrame()
 
     for file in file_list:

@@ -7,6 +7,7 @@ import plotly.graph_objs as go
 import numpy as np
 import math
 from PIL import Image
+import config
 
 # # # MUST HAVE TO FORCE WIDE MODE! DO NOT MOVE!!! # # #
 # Set the page layout
@@ -52,7 +53,8 @@ plot_width = 700
 plot_height = 700
 
 # Load dataset
-data = pd.read_csv('./data/Base.csv')  # Replace with your dataset file
+select_file_eda  =  st.selectbox(label = 'Select Data', options=config.file_list)
+data = pd.read_csv(f'./data/{select_file_eda}')  # Replace with your dataset file
 
 # Replace column names with easier to read names
 column_labels = {
