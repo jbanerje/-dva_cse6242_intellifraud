@@ -2,10 +2,19 @@
 IntelliFraud: Bank Account Fraud Detection
 
 ## Goal
-Goal of this application is to detect fraudulent bank account getting opened through online applications in a consumer bank. 
- - Our End to End application performs EDA, Looks at various model performances, Creates a graph network to detect fraud transaction flow and Creates an inferencing with feature importance and explanation of prediction thru SHAP.
- - This project demonstrates the use of graph network to analyze any fraudelent transaction pattern in the data.
- - Additionally, this project explores the possibility of getting better predictions thru voting and stacking classifiers comparing with LightGBM, XGBoost and AdaBoost.
+IntelliFraud represents an advanced online tool to revolutionize the identification of fraudulent applications for bank account openings. The tool incorporates an intuitive interactive dashboard that facilitates users in visually exploring extensive statistical data derived from all submitted applications.
+
+What distinguishes IntelliFraud is its distinctive methodology for scrutinizing fraud transactions through interactive graph network analysis , uses Voting & Stacking Classifer modelling technique to detect fraud and analyzes key features impacting the fraud vs non fraud decision using SHAP & ELI5. 
+
+Tool is divided into 4 sections:
+
+1. EDA - User can choose the dataset (Currently 6 Variants of Account Opening Fraud, customizable to any datasets) and perform exploratory data analysis.
+
+2. Fraud Network Analysis - User can choose the dataset and analyze the transaction thru Graph Network Analysis by removing or adding nodes/features to understand the flow of fraudulent transactions thru the network.
+
+3. Modelling - User can choose the data, Fraud vs Non Fraud Sampling Method and Model to observe and analyze various classification metrices and choose the apt model.
+
+4. Inference - Interactive User Interface for users to analyze the account opening fraud by adding data to the features and choosing the model. Interface also enables user to understand the factors leading to the model decision.
 
 ## Data 
 For our project, we referenced the Kaggle competition  Bank Account Fraud Dataset Suite (NeurIPS 2022)  [ https://www.kaggle.com/datasets/sgpjesus/bank-account-fraud-dataset-neurips-2022 ] that provided 6 datasets which are highly imbalaced.
@@ -14,7 +23,7 @@ For our project, we referenced the Kaggle competition  Bank Account Fraud Datase
 
 ## Artifacts
 Our application is desgined using Streamlit Pages concept.
-1. Upon launching `app.py`, it launches the home screen and on left we have 4 different pages to select from. 
+1. Upon launching `IntelliFraud_Home.py`, it launches the home screen and on left we have 4 different pages to select from. 
 
 2. All pages are loaded from `/pages` directory.
     * 1_EDA.py - Performs EDA on data and provides users interactivity.

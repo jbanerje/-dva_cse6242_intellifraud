@@ -36,42 +36,53 @@ st.image(image, width = 300)
 st.write("## IntelliFraud  - Account Opening Fraud Detection")
 
 # st.sidebar.success("Select a demo above.")
-
+st.info('Goal')
 st.markdown(
     """
-    ### Goal
-We aim to build a tool that detects fraudulent bank account opened through online applica-
-tions in a consumer bank. We intend to find the insights from bank account opening data,
-and use hybrid supervised boosting models like AdaBoost, CatBoost, XGBoost and Light-
-GBM models to detect fraudulent accounts. In practice, fraudulent individuals assume the
-identity of another bank account holder with the aim of illicitly accessing banking services.
-Once granted access, fraudulent individuals will max the accompanying line of credit, trans-
-fer money or participate in other illegal financial activities. These costs are often sustained
-by the bank, as tracing back these individuals can often be difficult, time consuming, and
-expensive.
-## How is it done today
-Financial Fraud detection is accomplished through a combination of traditional and advanced
-techniques which includes Transaction monitoring, Rule-Based systems, ML and AI, Behav-
-ioral Analysis, Anomaly detection. Machine Learning (ML) and Artificial Intelligence (AI). 
-One of the major obstacles in developing a robust tool for detecting fraud come from the inherent complexity of the data. 
-Take for example, the ratio of fraudulent transactions and genuine transactions. Often times a large
-imbalance exists between these too, leading to an increase in the false positive rate and a
-poor customer experience due to mis-classification.
 
-## Our Approach
-We will try to address some of these limitations by harnessing ensemble methodologies such
-as (e.g., Random Forests) or boosting (e.g., AdaBoost) to amalgamate the predictive prowess
-of multiple models. We have confidence that these methods will improve overall model
-robustness and reduce the potential for overfitting. While there are many tools that focus on
-identifying fraud, our approach will allow for end users to visualize and interact with the tools
-developed by Intellifraud. We hope that Intellifraud serves as a creative canvas for subject
-matter experts to improve upon existing methods, or the development of other tools.
+IntelliFraud represents an advanced online tool to revolutionize the identification of fraudulent applications for bank account openings. The tool incorporates an intuitive interactive dashboard that facilitates users in visually exploring extensive statistical data derived from all submitted applications.
 
-## Who Cares ?
-Data analytics departments in almost all banks and health care facilities [3] would care to
-explore this tool as it would have the capability to improve the fraud detection and analysis
-capabilities of those institutions. As an end user, bank customers, and hospitals dealing with
-various kinds of financial frauds [13] would be happy to see the increased safety and strength
-of fraud prevention teams.
-"""
-)
+What distinguishes IntelliFraud is its distinctive methodology for scrutinizing fraud transactions through interactive graph network analysis , uses Voting & Stacking Classifer modelling technique to detect fraud and analyzes key features impacting the fraud vs non fraud decision using SHAP & ELI5. 
+
+Tool is divided into 4 sections:
+
+1. EDA - User can choose the dataset (Currently 6 Variants of Account Opening Fraud, customizable to any datasets) and perform exploratory data analysis.
+
+2. Fraud Network Analysis - User can choose the dataset and analyze the transaction thru Graph Network Analysis by removing or adding nodes/features to understand the flow of fraudulent transactions thru the network.
+
+3. Modelling - User can choose the data, Fraud vs Non Fraud Sampling Method and Model to observe and analyze various classification metrices and choose the apt model.
+
+4. Inference - Interactive User Interface for users to analyze the account opening fraud by adding data to the features and choosing the model. Interface also enables user to understand the factors leading to the model decision.
+
+""")
+
+st.info('Visualizations')
+
+col1, col2= st.columns(2)
+with col1:
+    image = Image.open("./images/eda_1.jpg").resize((350, 300))
+    st.image(image, width = 300)
+    st.divider()
+    
+    image = Image.open("./images/Fraudulent_Transaction_Flow_2.jpg").resize((350, 300))
+    st.image(image, width = 300)
+    st.divider()
+
+    image = Image.open("./images/modelling_2.jpg").resize((350, 300))
+    st.image(image, width = 300)
+
+with col2:
+    image = Image.open("./images/eda_2.jpg").resize((350, 300))
+    st.image(image, width = 300)
+    st.divider()
+
+    image = Image.open("./images/modelling.jpg").resize((350, 300))
+    st.image(image, width = 300)
+
+st.divider()
+image = Image.open("./images/inference.jpg")
+st.image(image, width = 600)
+
+st.info('Code Repository')
+st.markdown("""Full Code : https://github.com/jbanerje/dva_cse6242_intellifraud
+            . Please folow the readme documentation for installations""")

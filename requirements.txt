@@ -10,3 +10,5 @@ seaborn
 networkx
 yellowbrick
 shap
+eli5
+streamlit_shap

@@ -187,28 +187,30 @@ def streamlit_interface():
     file_list = config.file_list
     intellifraud_dataset = pd.DataFrame()
 
-    for file in file_list:
-        # Read all variants
-        input_df = pd.read_csv(f"./data/{file}")
-
-        # Extract Fraud Transactions
-        input_df_fraud = input_df[input_df.fraud_bool==1]
-
-        # Append the data into fraud dataset
-        intellifraud_dataset = intellifraud_dataset.append(input_df_fraud)
-        print('Shape of intellifraud_dataset : ', intellifraud_dataset.shape)
-
-    # Create hierarchial Graph Layer
-    _, graph_layer = create_hierarchial_network_layer(intellifraud_dataset)
-    render_network_graph_default(graph_layer, None)
-
     # Sidebar Analysis
     st.sidebar.title('Analyze')
-    nodes_to_be_removed   =  st.sidebar.multiselect(label = 'Remove Nodes', options=config.remove_nodes)
     
-    if len(nodes_to_be_removed) > 0:
-        print(nodes_to_be_removed)
-        render_network_graph_default(graph_layer, nodes_to_be_removed)
+    # Load Input Data
+    select_data   =  st.sidebar.selectbox(label = 'Select Data', options=config.file_list)
+
+    nodes_to_be_removed     =  st.sidebar.multiselect(label = 'Remove Nodes', options=config.remove_nodes)
+    
+    if st. sidebar.button('Submit'):
+
+        # Read Dataset
+        input_df_fraud = pd.read_csv(f"./data/{select_data}")
+
+        # Extract Fraud Transactions
+        intellifraud_dataset = input_df_fraud[input_df_fraud.fraud_bool==1]
+        
+        # Create hierarchial Graph Layer
+        _, graph_layer = create_hierarchial_network_layer(intellifraud_dataset)
+        render_network_graph_default(graph_layer, None)
+
+        # Remove nodes
+        if len(nodes_to_be_removed) > 0:
+            print(nodes_to_be_removed)
+            render_network_graph_default(graph_layer, nodes_to_be_removed)
 
     return
 
