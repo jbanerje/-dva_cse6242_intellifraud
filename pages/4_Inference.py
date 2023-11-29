@@ -8,7 +8,48 @@ import joblib
 import numpy as np # linear algebra
 import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
 import shap
-shap.initjs()
+from streamlit_shap import st_shap
+import matplotlib.pyplot as plt
+import eli5
+from streamlit import components
+
+
+def show_inference(usr_model, inf_val):
+
+    ''' Function for model explainability '''
+
+    usr_model = joblib.load(f'./model/sample_1_1/LGBMClassifier.pkl')
+    X_train = pd.read_csv('./data/train_data_shap.csv')
+
+    inf_df = pd.DataFrame(inf_val, columns=['housing_status',
+                                                    'device_os',
+                                                    'credit_risk_score',
+                                                    'current_address_months_count',
+                                                    'has_other_cards',
+                                                    'keep_alive_session',
+                                                    'prev_address_months_count',
+                                                    'phone_home_valid',
+                                                    'proposed_credit_limit',
+                                                    'name_email_similarity',
+                                                    'income'
+                                                ])
+    
+    explainer = shap.Explainer(usr_model)
+    shap_values = explainer.shap_values(X_train)
+    
+    st.write("**SHAP Inference**")
+    st_shap(shap.plots.force(explainer.expected_value[1], 
+                 shap_values[0][0,:], 
+                 features = inf_val, 
+                 feature_names=list(X_train.columns),
+                 show=0
+                ))
+        
+    st.divider()
+    st.write("**ELI5 Inference**")
+    html_object  = eli5.show_prediction(usr_model, inf_df.iloc[0], show_feature_values=True)
+    raw_html = html_object._repr_html_()
+    components.v1.html(raw_html)
 
 def predict_fraud(usr_model, formatted_inp_for_prediction):
     
@@ -115,16 +156,10 @@ def streamlit_interface():
                     st.error('Its a Fraud Account!', icon="🚨")
                 else:
                     st.success('Not a Fraud', icon="✅")
+                
+                show_inference(usr_model, formatted_inp_for_prediction)
+    st.divider()
 
-                # # Plot Shap Figures
-                # explainer = shap.Explainer(classifier_model)
-                # st.pyplot(shap.plots.force(explainer.expected_value[0],
-                #                            shap_values[0][0]
-                #                            formatted_inp_for_prediction,
-                #                            feature_names = config.reqd_col_modelling[:-1],
-                #                            matplotlib = True
-                #                            )
-                #         )
     return
 
 if __name__ == '__main__':
