@@ -9,6 +9,15 @@ classifier_models   = ('LGBMClassifier',
                        'VotingClassifier', 
                        'StackingClassifier')
 
+shap_classifier_models   = ('LGBMClassifier', 
+                       'XGBClassifier' 
+                       #,'AdaBoostClassifier', 
+                       #'VotingClassifier', 
+                       #'StackingClassifier'
+                       )
+
+
+
 remove_nodes = ('INTERNET', 'TELEAPP', 'linux', 'macintosh', 'other','windows', 'x11', 'AA', 'AB', 'AC', 'AD', 'AE')
 file_list = ['Base.csv', 'variant_1.csv', 'variant_2.csv', 'variant_3.csv', 'variant_4.csv', 'variant_5.csv']
 sampling_strategy = ['1_1', '1_2', '1_3']
@@ -27,3 +36,17 @@ reqd_col_modelling = ['housing_status',
                             'income',
                             'fraud_bool' 
                         ]
+
+shap_columns = ['Housing Status',
+                'Device Operating System', 
+                'Credit Score',
+                'At Current Address (Months)',            
+                'Has Other Cards',
+                'Keep Alive Session',
+                'At Previous Address (Months)', 
+                'Has Valid Home Phone Num',
+                'Proposed Credit Limit',
+                'Similarity of Email to Name',
+                'Income'
+                ]
+

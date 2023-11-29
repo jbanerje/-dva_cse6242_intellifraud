@@ -12,20 +12,24 @@ def map_and_fmt_categorical_column(user_input):
     map_device_os         = {'windows':0,'other':1,'linux':2,'macintosh':3,'x11':4}
     map_cust_age          = {'< 50 yrs':0, '>= 50 yrs':1}
     
-    num_cust_age            = map_cust_age[user_input[0]]
-    num_employment_status   = map_employment_status[user_input[1]]
-    num_housing_status      = map_housing_status[user_input[2]]
-    num_payment_type        = map_payment_type[user_input[3]]
-    num_credit_limit        = int(user_input[4])
-    num_device_os           = map_device_os[user_input[5]]
-    num_valid_phone         = int(user_input[6])
-    num_has_oth_cards       = int(user_input[7])
-    num_session             = int(user_input[8])
-    num_prev_add            = int(user_input[9])
-    num_credit_score        = int(user_input[10])
-    num_age_prev_accnt      = int(user_input[11])
-    num_email_cnt           = int(user_input[12])
+    #num_cust_age            = map_cust_age[user_input[0]]
+    #num_employment_status   = map_employment_status[user_input[1]]
+    num_housing_status      = map_housing_status[user_input[0]]
+    #num_payment_type        = map_payment_type[user_input[3]]
+    num_credit_limit        = int(user_input[1])
+    num_device_os           = map_device_os[user_input[2]]
+    num_valid_phone         = int(user_input[3])
+    num_has_oth_cards       = int(user_input[4])
+    num_session             = int(user_input[5])
+    num_prev_add            = int(user_input[6])
+    num_credit_score        = int(user_input[7])
+    #num_age_prev_accnt      = int(user_input[11])
+    #num_email_cnt           = int(user_input[12])
+    num_current_address_months_count = int(user_input[8]) 
+    num_income                  =  int(user_input[9])
+    num_name_email_similarity =   int(user_input[10])
 
+    '''
     streamlit_form_layout = [num_cust_age, 
                                 num_employment_status, 
                                 num_housing_status,
@@ -40,8 +44,9 @@ def map_and_fmt_categorical_column(user_input):
                                 num_age_prev_accnt,
                                 num_email_cnt
                         ]
-    
-    return np.array([num_prev_add,
+    '''
+    '''  
+        return np.array([num_prev_add,
                         num_email_cnt,
                         num_credit_score,
                         num_age_prev_accnt,
@@ -55,4 +60,16 @@ def map_and_fmt_categorical_column(user_input):
                         num_valid_phone,
                         num_payment_type
                 ]).reshape(1, -1)
+        '''
 
+    return np.array([num_housing_status,
+                        num_device_os,
+                        num_credit_score,
+                        num_current_address_months_count, #new
+                        num_has_oth_cards,
+                        num_session,
+                        num_prev_add,
+                        num_valid_phone,
+                        num_credit_limit,
+                        num_name_email_similarity,      #new
+                        num_income]).reshape(1, -1)
