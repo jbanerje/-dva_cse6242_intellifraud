@@ -134,7 +134,7 @@ if data[selected_column].dtype in ['int64', 'float64']:
         fig.update_layout(
             title=f"Count Plot of {selected_feature}",
             xaxis_title=selected_feature,
-            title_x=0.5,
+            title_x=0.35,
             title_y=0.92,
             yaxis_title="Count",
             width=800,
