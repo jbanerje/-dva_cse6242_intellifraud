@@ -35,6 +35,7 @@ Our application is desgined using Streamlit Pages concept.
     * exploratory_data_analysis.ipynb - Notebook for basic EDA and Exploration for modelling.
     * network_visualization.ipynb - Vizualiton of Graph network showing the fraudulent transaction flow thru various networks and subsystems.
     * intellifraud-data-modelling-all-var.ipynb - Building the models.
+    * inference_sample.ipynb - Sample of inferences obtained from selected model and parameters.
 
 ## Installation
 1. Clone the repository from github.
